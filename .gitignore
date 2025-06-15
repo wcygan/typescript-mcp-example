@@ -1,0 +1,52 @@
+# Dependencies and build artifacts
+node_modules/
+.deno_cache/
+dist/
+build/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Secrets and credentials
+*secret*
+*key*
+*credential*
+*.pem
+*.p12
+*.pfx
+kubeconfig*
+!kubeconfig.example
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Runtime and temporary files
+.cache/
+.tmp/
+tmp/
+
+# Claude configuration (contains personal settings)
+.claude/
+
+# Development overrides
+docker-compose.override.yml
+kubernetes-local.yaml
+
+# Testing artifacts
+coverage/
+.nyc_output/
+junit.xml
