@@ -34,21 +34,14 @@ async function testListPods(namespace = "default", labelSelector?: string) {
   if (labelSelector) console.log(`   Label selector: ${labelSelector}`);
   
   try {
-    const response = await k8sApi.listNamespacedPod(
-      namespace,
-      undefined, // pretty
-      undefined, // allowWatchBookmarks
-      undefined, // continue
-      undefined, // fieldSelector
-      labelSelector // labelSelector
-    );
+    const response = await k8sApi.listNamespacedPod(namespace);
     
-    const pods = response.body.items.map(pod => ({
+    const pods = (response as any).body.items.map((pod: any) => ({
       name: pod.metadata?.name,
       namespace: pod.metadata?.namespace,
       status: pod.status?.phase,
-      ready: `${pod.status?.containerStatuses?.filter(c => c.ready).length || 0}/${pod.status?.containerStatuses?.length || 0}`,
-      restarts: pod.status?.containerStatuses?.reduce((total, c) => total + c.restartCount, 0) || 0,
+      ready: `${pod.status?.containerStatuses?.filter((c: any) => c.ready).length || 0}/${pod.status?.containerStatuses?.length || 0}`,
+      restarts: pod.status?.containerStatuses?.reduce((total: number, c: any) => total + c.restartCount, 0) || 0,
       age: pod.metadata?.creationTimestamp ? 
         Math.floor((Date.now() - new Date(pod.metadata.creationTimestamp).getTime()) / 1000 / 60) + 'm' : 'unknown'
     }));
@@ -76,18 +69,18 @@ async function testGetPod(name: string, namespace = "default") {
   
   try {
     const response = await k8sApi.readNamespacedPod(name, namespace);
-    const pod = response.body;
+    const pod = (response as any).body;
     
     const result = {
       pod: {
         name: pod.metadata?.name,
         namespace: pod.metadata?.namespace,
         status: pod.status?.phase,
-        containers: pod.spec?.containers?.map(c => ({
+        containers: pod.spec?.containers?.map((c: any) => ({
           name: c.name,
           image: c.image,
-          ready: pod.status?.containerStatuses?.find(cs => cs.name === c.name)?.ready || false,
-          restartCount: pod.status?.containerStatuses?.find(cs => cs.name === c.name)?.restartCount || 0
+          ready: pod.status?.containerStatuses?.find((cs: any) => cs.name === c.name)?.ready || false,
+          restartCount: pod.status?.containerStatuses?.find((cs: any) => cs.name === c.name)?.restartCount || 0
         })) || [],
         conditions: pod.status?.conditions || []
       }
@@ -119,9 +112,9 @@ async function testListNodes(labelSelector?: string) {
   try {
     const response = await k8sApi.listNode();
     
-    const nodes = response.body.items.map(node => ({
+    const nodes = (response as any).body.items.map((node: any) => ({
       name: node.metadata?.name,
-      status: node.status?.conditions?.find(c => c.type === 'Ready')?.status === 'True' ? 'Ready' : 'NotReady',
+      status: node.status?.conditions?.find((c: any) => c.type === 'Ready')?.status === 'True' ? 'Ready' : 'NotReady',
       roles: node.metadata?.labels?.['node-role.kubernetes.io/control-plane'] ? ['control-plane'] : ['worker'],
       age: node.metadata?.creationTimestamp ? 
         Math.floor((Date.now() - new Date(node.metadata.creationTimestamp).getTime()) / 1000 / 60 / 60 / 24) + 'd' : 'unknown',
